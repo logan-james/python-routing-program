@@ -16,10 +16,9 @@ class Package:
         return f"Package {self.id}: {self.address}, {self.city}, {self.state}, {self.zipcode}, {self.deadline}, {self.weight}, {self.status}, Delivered at: {self.delivery_time}"
 
     def update_status(self, current_time):
-        # Update status based on delivery and departure times
-        if self.delivery_time and self.delivery_time < current_time:
+        if self.delivery_time and self.delivery_time <= current_time:
             self.status = "Delivered"
         elif self.departure_time and self.departure_time <= current_time:
-            self.status = "En Route"
+            self.status = "En route"
         else:
             self.status = "At Hub"
