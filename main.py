@@ -61,7 +61,6 @@ def nearest_neighbor(truck, packages, distance_data):
     """
     current_address = truck.current_location
     while truck.packages:
-        # Find the nearest undelivered package
         next_package = min(
             truck.packages, key=lambda p: get_distance(current_address, packages.lookup(p).address)
         )
@@ -69,11 +68,9 @@ def nearest_neighbor(truck, packages, distance_data):
         distance = get_distance(current_address, package.address)
         delivery_time = datetime.timedelta(hours=distance / truck.speed)
 
-        # Update package information
         package.departure_time = truck.depart_time
         package.delivery_time = truck.current_time + delivery_time
 
-        # Deliver the package
         truck.deliver_package(next_package, distance, delivery_time)
         current_address = package.address
 
@@ -129,6 +126,23 @@ def show_total_mileage(trucks):
     total_mileage = sum(truck.mileage for truck in trucks)
     print(f"Total mileage traveled by all trucks: {total_mileage:.2f}")
 
+def show_truck_packages_status_for_timeframe(truck, package_hash, start_time, end_time):
+    print(f"\nPackages status for truck departing at {format_time(truck.depart_time)} between {format_time(start_time)} and {format_time(end_time)}:")
+    print("-" * 50)
+    print(f"{'Package ID':^10} | {'Status':^15} | {'Delivery Time':^15}")
+    print("-" * 50)
+    for package_id in truck.all_packages:
+        package = package_hash.lookup(package_id)
+        if start_time <= package.delivery_time <= end_time:
+            status = "Delivered"
+            delivery_time = format_time(package.delivery_time)
+        elif package.departure_time <= end_time and (package.delivery_time is None or package.delivery_time > end_time):
+            status = "En route"
+            delivery_time = "N/A"
+        else:
+            continue  # Skip packages not relevant to this time frame
+        print(f"{package_id:^10} | {status:^15} | {delivery_time:^15}")
+
 
 def main():
     print("Welcome to WGUPS Package Tracking System")
@@ -182,7 +196,9 @@ def main():
         elif choice == '3':
             show_total_mileage([truck1, truck2, truck3])
 
+
         elif choice == '4':
+
             print("\nSelect a time frame:")
             print("1. 8:35 a.m. to 9:25 a.m.")
             print("2. 9:35 a.m. to 10:25 a.m.")
@@ -201,9 +217,8 @@ def main():
             else:
                 print("Invalid choice. Please select 1, 2, or 3.")
                 continue
-
             for truck in [truck1, truck2, truck3]:
-                show_truck_packages_status(truck, package_hash, start_time, end_time)
+                show_truck_packages_status_for_timeframe(truck, package_hash, start_time, end_time)
 
         elif choice == '5':
             print("Thank you for using WGUPS Package Tracking System. Goodbye!")
