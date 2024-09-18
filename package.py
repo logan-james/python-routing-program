@@ -1,5 +1,3 @@
-# package.py
-
 class Package:
     def __init__(self, package_id, address, city, state, zipcode, deadline, weight, status):
         # Initialize a Package object with all necessary attributes

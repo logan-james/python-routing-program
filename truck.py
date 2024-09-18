@@ -1,5 +1,3 @@
-# truck.py
-
 class Truck:
     def __init__(self, capacity, speed, packages, current_location, mileage=0, depart_time=None):
         # Initialize a Truck object with all necessary attributes

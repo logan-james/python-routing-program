@@ -12,10 +12,12 @@ with open("csv/distances.csv") as f:
 with open("csv/addresses.csv") as f:
     address_data = list(csv.reader(f))
 
-
-# Load package data from a CSV file into a hash table.
-# Each package is represented by a Package object, and this function populates a HashTable with package information.
-# The 'filename' argument specifies the CSV file containing package details.
+# Function: load_packages
+# Purpose: This function loads package data from a CSV file into a custom HashTable.
+# The 'filename' argument is the CSV file containing package details like address, deadline, and delivery status.
+# Each row in the CSV represents a Package object, which is then inserted into the HashTable.
+# Why: Storing packages in a HashTable allows for fast lookups during the delivery process.
+# How: The CSV reader parses each row, creates a Package object, and inserts it into the hash table using the package ID as the key.
 def load_packages(filename):
     # Load package data from CSV file into a hash table
     packages = HashTable()
@@ -26,6 +28,7 @@ def load_packages(filename):
             # Create a Package object and insert it into the hash table
             package = Package(package_id, row[1], row[2], row[3], row[4], row[5], row[6], "At Hub")
             packages.insert(package_id, package)
+
     return packages
 
 
@@ -40,8 +43,18 @@ def get_distance(from_address, to_address):
     return float(distance)
 
 
-# This function implements the Nearest Neighbor algorithm to optimize package delivery routing for a truck.
-# It selects the nearest package to the truck's current location, delivers it, and repeats the process until all packages are delivered.
+# Function: nearest_neighbor
+# Purpose: This function optimizes the delivery route for a truck using the Nearest Neighbor algorithm.
+# The goal is to minimize the total distance traveled by always selecting the closest package's destination
+# from the truck's current location.
+# Why: Nearest Neighbor is a simple but effective heuristic to reduce total mileage in routing problems like
+# package delivery.
+# How:
+# 1. The truck's current location is set to its departure point.
+# 2. The function iterates through the undelivered packages on the truck.
+# 3. For each iteration, it calculates the distance between the current location and the destination of each package.
+# 4. The nearest package is selected for delivery, and the truck's location is updated.
+# 5. This process continues until all packages on the truck are delivered.
 def nearest_neighbor(truck, packages, distance_data):
     # Implement the Nearest Neighbor algorithm for package delivery
     current_address = truck.current_location
@@ -69,7 +82,13 @@ def format_time(time_delta):
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
-# Function to display status of all packages at a given time
+# Function: show_package_status
+# Purpose: This function displays the current status of all packages at a given time.
+# Why: The user may want to check the status of packages at a specific point in time (e.g., whether they are still at the hub, en route, or delivered).
+# How:
+# 1. The function accepts a hash table containing all package data and a 'check_time' for status.
+# 2. It iterates through all packages in the hash table, updating their status based on their delivery and departure times.
+# 3. For each package, it prints the ID, address, status (at hub, en route, delivered), and other package details.
 def show_package_status(package_hash, check_time):
     # Display status of all packages at a given time
     print(f"\nPackage Status at {format_time(check_time)}:")
@@ -97,6 +116,7 @@ def show_truck_packages_status(truck, package_hash, start_time, end_time):
             delivery_time = format_time(package.delivery_time)
         elif package.departure_time and start_time <= package.departure_time <= end_time:
             status = "En route"
+
             delivery_time = "N/A"
         elif package.departure_time and package.departure_time < start_time:
             status = "En route"
@@ -129,6 +149,8 @@ def show_truck_packages_status_for_timeframe(truck, package_hash, start_time, en
         else:
             continue  # Skip packages not relevant to this time frame
         print(f"{package_id:^10} | {status:^15} | {delivery_time:^15}")
+
+
 
 # Main function: User interface for the WGUPS Package Tracking System
 def main():
