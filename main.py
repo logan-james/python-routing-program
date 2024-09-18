@@ -1,6 +1,8 @@
 # Logan Arguello
 # Student ID# 012053764
 # C950
+# WGUPS (Western Governors University Parcel Service) Package Delivery Simulation
+# This script simulates a package delivery system, optimizing routes and tracking package statuses.
 
 import csv
 import datetime
@@ -65,14 +67,14 @@ def nearest_neighbor(truck, packages, distance_data):
         truck.deliver_package(next_package, distance, delivery_time)
         current_address = package.address
 
-# This is used to display times in a readable format.
+# Utility function to format time for display
 def format_time(time_delta):
     # Convert timedelta to formatted string (HH:MM:SS)
     hours, remainder = divmod(time_delta.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
-
+# Function to display status of all packages at a given time
 def show_package_status(package_hash, check_time):
     # Display status of all packages at a given time
     print(f"\nPackage Status at {format_time(check_time)}:")
@@ -86,7 +88,7 @@ def show_package_status(package_hash, check_time):
             print(f"{package.id:^4} | {package.address:<30} | {package.city:<15} | {package.state:^5} | {package.zipcode:^5} | {package.deadline:^10} | {package.weight:^8} | {package.status:^10}")
 
 
-
+# Function to display status of packages on a specific truck within a time frame
 def show_truck_packages_status(truck, package_hash, start_time, end_time):
     print(f"\nPackages status for truck departing at {format_time(truck.depart_time)} between {format_time(start_time)} and {format_time(end_time)}:")
     print("-" * 50)
@@ -109,9 +111,8 @@ def show_truck_packages_status(truck, package_hash, start_time, end_time):
             delivery_time = "N/A"
         print(f"{package_id:^10} | {status:^15} | {delivery_time:^15}")
 
-
+# Calculate and display total mileage traveled by all trucks
 def show_total_mileage(trucks):
-    # Calculate and display total mileage traveled by all trucks
     total_mileage = sum(truck.mileage for truck in trucks)
     print(f"Total mileage traveled by all trucks: {total_mileage:.2f}")
 
@@ -134,11 +135,11 @@ def show_truck_packages_status_for_timeframe(truck, package_hash, start_time, en
             continue  # Skip packages not relevant to this time frame
         print(f"{package_id:^10} | {status:^15} | {delivery_time:^15}")
 
-
+# Main function: User interface for the WGUPS Package Tracking System
 def main():
-    # Main function to run the WGUPS Package Tracking System
     print("Welcome to WGUPS Package Tracking System")
 
+    # Main program loop
     while True:
         # Display menu options
         print("\nMenu Options:")
@@ -148,10 +149,12 @@ def main():
         print("4. View package status for specific time frame")
         print("5. Exit")
 
+        # Get user input for menu choice
         choice = input("Enter your choice (1-5): ")
 
+        # Process user's choice
         if choice == '1':
-            # Check status of all packages at a specific time
+            # Option 1: Check status of all packages at a specific time
             time_input = input("Enter time to check status (HH:MM): ")
             try:
                 h, m = map(int, time_input.split(":"))
@@ -161,13 +164,15 @@ def main():
                 print("Invalid time format. Please use HH:MM.")
 
         elif choice == '2':
-            # Check status of a specific package at a specific time
+            # Option 2: Check status of a specific package at a specific time
             package_id = input("Enter package ID: ")
             time_input = input("Enter time to check status (HH:MM): ")
             try:
+                # Convert inputs to appropriate types
                 package_id = int(package_id)
                 h, m = map(int, time_input.split(":"))
                 check_time = datetime.timedelta(hours=h, minutes=m)
+                # Lookup package and display its status
                 package = package_hash.lookup(package_id)
                 if package:
                     package.update_status(check_time)
@@ -189,17 +194,18 @@ def main():
                 print("Invalid input. Please enter a valid package ID and time (HH:MM).")
 
         elif choice == '3':
-            # View total mileage for all trucks
+            # Option 3: View total mileage for all trucks
             show_total_mileage([truck1, truck2, truck3])
 
         elif choice == '4':
-            # View package status for a specific time frame
+            # Option 4: View package status for a specific time frame
             print("\nSelect a time frame:")
             print("1. 8:35 a.m. to 9:25 a.m.")
             print("2. 9:35 a.m. to 10:25 a.m.")
             print("3. 12:03 p.m. to 1:12 p.m.")
             time_choice = input("Enter your choice (1-3): ")
 
+            # Set start and end times based on user's choice
             if time_choice == '1':
                 start_time = datetime.timedelta(hours=8, minutes=35)
                 end_time = datetime.timedelta(hours=9, minutes=25)
@@ -212,20 +218,22 @@ def main():
             else:
                 print("Invalid choice. Please select 1, 2, or 3.")
                 continue
+            # Display package status for each truck within the selected time frame
             for truck in [truck1, truck2, truck3]:
                 show_truck_packages_status_for_timeframe(truck, package_hash, start_time, end_time)
 
         elif choice == '5':
-            # Exit the program
+            # Option 5: Exit the program
             print("Thank you for using WGUPS Package Tracking System. Goodbye!")
             break
 
         else:
+            # Handle invalid menu choices
             print("Invalid choice. Please enter a number between 1 and 5.")
 
-
+# Script entry point
 if __name__ == "__main__":
-    # Load packages and initialize trucks
+    # Initialize simulation: load packages, create trucks, and run delivery optimization
     package_hash = load_packages("csv/packages.csv")
 
     # Assign packages to trucks (manually based on constraints)
@@ -238,7 +246,7 @@ if __name__ == "__main__":
     truck2 = Truck(16, 18, truck2_packages, "4001 South 700 East", depart_time=datetime.timedelta(hours=9, minutes=5))
     truck3 = Truck(16, 18, truck3_packages, "4001 South 700 East", depart_time=datetime.timedelta(hours=10, minutes=20))
 
-    # Run delivery simulation using Nearest Neighbor algorithm
+    # Run delivery simulation using Nearest Neighbor algorithm for each truck
     nearest_neighbor(truck1, package_hash, distance_data)
     nearest_neighbor(truck2, package_hash, distance_data)
     nearest_neighbor(truck3, package_hash, distance_data)

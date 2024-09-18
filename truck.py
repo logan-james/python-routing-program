@@ -12,14 +12,14 @@ class Truck:
         self.depart_time = depart_time
         self.current_time = depart_time
 
+    # Simulate package delivery and update truck status
     def deliver_package(self, package_id, distance, time):
-        # Simulate package delivery and update truck status
         self.mileage += distance
         self.current_time += time
         self.packages.remove(package_id)
         self.current_location = self.get_package_address(package_id)
 
+    # Placeholder method to get package address
+    # In a real implementation, this would interact with the package management system
     def get_package_address(self, package_id):
-        # Placeholder method to get package address
-        # In a real implementation, this would interact with the package management system
         return "Package Address"

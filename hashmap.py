@@ -3,13 +3,13 @@ class HashTable:
         # Initialize the hash table with empty buckets
         self.table = [[] for _ in range(capacity)]
 
+    # Generate a hash value for the given key
     def _hash_key(self, key):
-        # Generate a hash value for the given key
         return hash(key) % len(self.table)
 
+    # Insert a key-value pair into the hash table
+    # If the key exists, update its value; otherwise, add a new pair
     def insert(self, key, value):
-        # Insert a key-value pair into the hash table
-        # If the key exists, update its value; otherwise, add a new pair
         bucket_index = self._hash_key(key)
         bucket = self.table[bucket_index]
 
@@ -20,8 +20,8 @@ class HashTable:
 
         bucket.append((key, value))
 
+    # Look up a value in the hash table by its key
     def lookup(self, key):
-        # Look up a value in the hash table by its key
         bucket_index = self._hash_key(key)
         bucket = self.table[bucket_index]
 
@@ -31,8 +31,8 @@ class HashTable:
 
         return None
 
+    # Remove a key-value pair from the hash table
     def remove(self, key):
-        # Remove a key-value pair from the hash table
         bucket_index = self._hash_key(key)
         bucket = self.table[bucket_index]
 
