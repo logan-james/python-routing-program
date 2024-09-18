@@ -1,8 +1,3 @@
-# Logan Arguello
-# Student ID# 012053764
-# C950
-# WGUPS (Western Governors University Parcel Service) Package Delivery Simulation
-# This script simulates a package delivery system, optimizing routes and tracking package statuses.
 
 import csv
 import datetime
