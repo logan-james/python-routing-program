@@ -88,37 +88,38 @@ def get_truck_number(package, trucks):
 def show_package_status(package_hash, check_time, trucks):
     print(f"\nPackage Status at {format_time(check_time)}:")
     print("-" * 140)
-    print(
-        f"{'ID':^4} | {'Address':^30} | {'City':^15} | {'State':^5} | {'Zip':^5} | {'Deadline':^10} | {'Weight':^8} | {'Status':^10} | {'Truck':^5} | {'Delivery Time':^15}")
+    print(f"{'ID':^4} | {'Address':^30} | {'City':^15} | {'State':^5} | {'Zip':^5} | {'Deadline':^10} | {'Weight':^8} | {'Status':^10} | {'Truck':^5} | {'Delivery Time':^15}")
     print("-" * 140)
     for i in range(1, 41):
         package = package_hash.lookup(i)
         if package:
+            package.check_and_update_address(check_time)  # Add this line to update the address
             package.update_status(check_time)
             truck_num = get_truck_number(package, trucks)
             delivery_time = format_time(package.delivery_time) if package.delivery_time else "N/A"
-            print(
-                f"{package.id:^4} | {package.address:<30} | {package.city:<15} | {package.state:^5} | {package.zipcode:^5} | {package.deadline:^10} | {package.weight:^8} | {package.status:^10} | {truck_num:^5} | {delivery_time:^15}")
-
+            print(f"{package.id:^4} | {package.address:<30} | {package.city:<15} | {package.state:^5} | {package.zipcode:^5} | {package.deadline:^10} | {package.weight:^8} | {package.status:^10} | {truck_num:^5} | {delivery_time:^15}")
 
 def show_truck_packages_status_for_timeframe(truck, package_hash, start_time, end_time):
-    print(f"\nPackages status for truck {truck.id} departing at {format_time(truck.depart_time)} between {format_time(start_time)} and {format_time(end_time)}:")
+    print(
+        f"\nPackages status for truck {truck.id} departing at {format_time(truck.depart_time)} between {format_time(start_time)} and {format_time(end_time)}:")
     print("-" * 70)
     print(f"{'Package ID':^10} | {'Status':^15} | {'Delivery Time':^15} | {'Address':^25}")
     print("-" * 70)
-    for package_id in truck.all_package_ids:  # Changed from all_packages to all_package_ids
+    for package_id in truck.all_package_ids:
         package = package_hash.lookup(package_id)
-        if start_time <= package.delivery_time <= end_time:
-            status = "Delivered"
-            delivery_time = format_time(package.delivery_time)
-        elif package.departure_time <= end_time and (package.delivery_time is None or package.delivery_time > end_time):
-            status = "En route"
-            delivery_time = "N/A"
-        else:
-            continue  # Skip packages not relevant to this time frame
-        print(f"{package_id:^10} | {status:^15} | {delivery_time:^15} | {package.address:<25}")
+        if package.delivery_time <= end_time:
+            if package.delivery_time <= start_time:
+                status = "Delivered"
+                delivery_time = format_time(package.delivery_time)
+            elif start_time < package.delivery_time <= end_time:
+                status = "Delivered"
+                delivery_time = format_time(package.delivery_time)
+            else:
+                status = "En route"
+                delivery_time = "N/A"
 
-
+            package.check_and_update_address(end_time)
+            print(f"{package_id:^10} | {status:^15} | {delivery_time:^15} | {package.address:<25}")
 
 def show_total_mileage(trucks):
     print("\nMileage Report:")
